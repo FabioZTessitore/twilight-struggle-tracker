@@ -1,33 +1,26 @@
 {
-    "description": "Twilight Struggle Assistant. Calcola il punteggio corrente nei vari continenti",
-    "continenti": [
+    "description": "Help to track current and potential score for the game Twilight Struggle",
+    "regions": [
         {
-            "nome": "Europa",
-            "punti": {
-                "presenza": 0,
-                "controllo": 0,
-                "dominazione": 0,
-                "extra": "extra info here"
+            "name": "Europe",
+            "points": {
+                "presence": 3,
+                "domination": 7,
+                "control": 1000
             },
-            "stati": [
-                {
-                    "nome": "Italia",
-                    "controllo": "USA | URSS | none",
-                    "conteso": true,
-                    "adiacente": "USA | URSS | none"
-                }
-            ],
+            "countries": [ "list of countries" ],
+            
+            // getters
             "USA": {
-                "punti": 0,
-                "contesi": 0,
-                "totali": 0
+                "points": 0,
+                "battleground": 0,
+                "no-battleground": 0
             },
             "URSS": {
-                "punti": 0,
-                "contesi": 0,
-                "totali": 0
+                "points": 0,
+                "battleground": 0,
+                "no-battleground": 0
             }
         }
-    ],
-    "note": "Per ogni continente, per ogni stato, se e' sotto controllo, se e' adiacente, se e' conteso -> aggiorna punteggio"
+    ]
 }

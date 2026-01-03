@@ -1,0 +1,10 @@
+[
+    {
+        "name": "Italy",
+        "battleground": true,
+        "stability": "2",
+        "blue-influence": 0,
+        "red-influence": 0,
+        "adjacentTo": "none"
+    }
+]
