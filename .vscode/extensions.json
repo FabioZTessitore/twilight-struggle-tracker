@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "expo.vscode-expo-tools",
+        "dsznajder.es7-react-js-snippets"
+    ]
+}
