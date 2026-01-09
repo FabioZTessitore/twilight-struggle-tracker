@@ -1,3 +1,3 @@
 export * from './SheetModal';
 export * from './TabBarIcon';
-export * from './FlipCounter';
+export * from './PickerInfluence';

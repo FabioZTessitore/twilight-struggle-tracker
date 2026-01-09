@@ -1,13 +1,11 @@
-import { View } from 'react-native';
-import { Icon, Text } from '~/components/ui';
-import { FlipCounter } from '~/components/partials';
-import { StyleSheet, SectionList, StatusBar, Pressable } from 'react-native';
 import { useState } from 'react';
-
-import Regions from '~/components/ts/Regions';
+import { View, SectionList, Pressable } from 'react-native';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { Icon, Text } from '~/components/ui';
+import { PickerInfluence } from '~/components/partials';
+import { cn } from '~/lib/cn';
 import { useTrackerStore } from '~/store/tracker';
 import { RegionId, Country } from '~/store/types';
-import Animated, { FadeOutRight, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 export default function Index() {
   const { regions, countries } = useTrackerStore();
@@ -35,16 +33,20 @@ export default function Index() {
   return (
     <View className="flex-1 px-4">
       <SectionList
+        ListHeaderComponent={
+          <View className="mb-4 rounded-2xl p-4">
+            <Text variant={'heading'} color={'primary'}>
+              Punti Potenziali: 3
+            </Text>
+          </View>
+        }
+        stickySectionHeadersEnabled
         sections={sections}
         keyExtractor={(item) => item.name}
         extraData={expandedSections}
         renderItem={({ section, item }) => {
           if (!expandedSections.has(section.regionId)) return null;
-          return (
-            <Animated.View exiting={FadeOutRight.duration(50)}>
-              <CountryItem country={item} />
-            </Animated.View>
-          );
+          return <CountryItem country={item} />;
         }}
         showsVerticalScrollIndicator={false}
         renderSectionHeader={({ section }) => (
@@ -54,26 +56,48 @@ export default function Index() {
             onPress={() => handleToggle(section.regionId)}
           />
         )}
-        stickySectionHeadersEnabled
       />
     </View>
   );
 }
 
-const CountryItem = ({ country }: { country: Country }) => (
-  <View className="flex-row justify-center gap-8 p-2">
-    <FlipCounter count={country.blueInfluence} />
+const CountryItem = ({ country }: { country: Country }) => {
+  return (
+    <View className="flex-row items-center justify-center gap-6 p-2">
+      <PickerInfluence
+        color={
+          country.blueInfluence - country.redInfluence >= country.stability ? 'blue-500' : undefined
+        }
+        max={30}
+        min={0}
+        onChange={() => {}}
+      />
 
-    <View className="w-1/3 items-center">
-      <Text>
-        {country.name}
-        {country.battleground ? ' ★' : ''}
-      </Text>
+      <View
+        className={cn(
+          'w-28 items-center justify-center rounded-2xl p-2',
+          country.battleground ? 'bg-purple-950' : 'bg-yellow-100'
+        )}>
+        <Text
+          variant={'label'}
+          className={cn(country.battleground ? 'text-foreground' : 'text-background')}>
+          {country.name}
+        </Text>
+      </View>
+
+      <PickerInfluence
+        color={
+          country.redInfluence - country.blueInfluence >= country.stability ? 'red-500' : undefined
+        }
+        max={10}
+        min={0}
+        onChange={(n) => {
+          console.log('numero', n, 'è', country.stability);
+        }}
+      />
     </View>
-
-    <FlipCounter count={country.redInfluence} />
-  </View>
-);
+  );
+};
 
 const RegionHeader = ({
   title,
@@ -90,7 +114,7 @@ const RegionHeader = ({
   return (
     <View className="mb-2 rounded-2xl bg-card">
       <Pressable className="flex-row items-center justify-between p-4" onPress={onPress}>
-        <Text variant="heading">{title}</Text>
+        <Text variant="heading">{title}: 8</Text>
 
         <Animated.View style={animatedStyle}>
           <Icon name="arrow-right" />
