@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Pressable, Dimensions } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
@@ -17,50 +17,49 @@ interface PickerProps {
 export const PickerInfluence = ({ min, max, value = min, color, onChange }: PickerProps) => {
   const [selected, setSelected] = useState(value);
 
-  const numbers = [];
-  for (let i = min; i <= max; i++) numbers.push(i);
-
-  const CENTER = Math.floor((max - min) / 2) + min;
   const step = 32;
+  const RANGE = 1; // [prev current next]
 
-  const MIN_TRANSLATE = (CENTER - max) * step;
-  const MAX_TRANSLATE = (CENTER - min) * step;
+  const [baseValue, setBaseValue] = useState(value);
+  const translateX = useSharedValue(0);
+  const dragX = useSharedValue(0);
 
-  const translateX = useSharedValue((CENTER - selected) * step);
-  const lastStep = useSharedValue<number | null>(null);
+  const DRAG_RATIO = 0.05; // 0.25–0.4 range sano
 
+  const numbers = useMemo(() => {
+    const out: number[] = [];
+    for (let i = baseValue - RANGE; i <= baseValue + RANGE; i++) {
+      if (i >= min && i <= max) out.push(i);
+    }
+    return out;
+  }, [baseValue, min, max]);
   // Gestione del drag
   const gesture = Gesture.Pan()
-    .onStart(() => {
-      translateX.set((CENTER - selected) * step);
-      lastStep.set(selected);
-    })
     .onUpdate((e) => {
-      const next = (CENTER - selected) * step + e.translationX;
-      translateX.set(Math.max(MIN_TRANSLATE, Math.min(MAX_TRANSLATE, next)));
+      dragX.set((value) => value + e.velocityX * DRAG_RATIO);
 
-      const offset = Math.round(translateX.value / step);
-      const nextNumber = CENTER - offset;
+      if (dragX.value <= -step && baseValue < max) {
+        dragX.set((value) => value + step);
 
-      // quando cambia numero
-      if (nextNumber !== lastStep.value) {
-        lastStep.set(nextNumber);
-        Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Heavy);
+        setBaseValue((v) => v + 1);
+        Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Light);
+      }
+
+      if (dragX.value >= step && baseValue > min) {
+        dragX.set((value) => value - step);
+        setBaseValue((v) => v - 1);
+
+        Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Light);
       }
     })
     .onEnd(() => {
-      const offset = Math.round(translateX.value / step);
-      const nextNumber = CENTER - offset;
-
-      setSelected(nextNumber);
-      onChange(nextNumber);
-
-      translateX.set(withSpring((CENTER - nextNumber) * step));
+      dragX.set(withSpring(0));
+      onChange(baseValue);
     })
     .runOnJS(true);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
+    transform: [{ translateX: dragX.value }],
   }));
 
   return (
@@ -74,8 +73,8 @@ export const PickerInfluence = ({ min, max, value = min, color, onChange }: Pick
           {numbers.map((n) => (
             <View key={n} className="w-8 items-center justify-center ">
               <Text
-                variant={n === selected ? 'heading' : 'body'}
-                className={n === selected ? `text-foreground` : 'text-gray-600'}>
+                variant={n === baseValue ? 'body' : 'body'}
+                className={n === baseValue ? `text-foreground` : 'text-gray-600'}>
                 {n}
               </Text>
             </View>
