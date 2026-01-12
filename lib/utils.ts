@@ -22,3 +22,5 @@ export const formatDate = (date: Date) => {
   const year = date.getFullYear(); // Ottieni l'anno
   return `${day}/${month}/${year}`; // Restituisce la data nel formato gg/mm/aaaa
 };
+
+export const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
