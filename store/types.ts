@@ -18,7 +18,6 @@ export interface Country {
   stability: number;
   blueInfluence: number;
   redInfluence: number;
-  adjacentTo: 'USA' | 'URSS' | null;
   region: keyof Regions;
   subregion?: 'SEAsia';
   tempBattleground?: boolean;

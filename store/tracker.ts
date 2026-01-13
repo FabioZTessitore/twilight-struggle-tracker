@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { regions } from '~/store/regions_data';
-import { countries } from '~/store/countries_data';
+import { countries as countriesData } from '~/store/countries_data';
 import { Countries, Regions, TTrackerStore } from './types';
 
 export interface TTrackerState {
@@ -19,12 +19,13 @@ export interface TTrackerMutations {
 
 export interface TTrackerAction {
   setInfluence: (countryName: string, side: 'blue' | 'red', value: number) => void;
+  clearInfluences: () => void;
 }
 
 const trackerState = {
   regions: regions,
 
-  countries: countries as Countries,
+  countries: countriesData as Countries,
 } satisfies TTrackerState;
 
 const trackerMutations = {
@@ -50,6 +51,13 @@ const trackerAction = {
       side === 'blue' ? value : country.blueInfluence,
       side === 'red' ? value : country.redInfluence
     );
+  },
+  clearInfluences: () => {
+    const { countries } = useTrackerStore.getInitialState();
+    const { setCountries } = useTrackerStore.getState();
+
+    setCountries(countries);
+    // setCountries(countriesData);
   },
 } satisfies TTrackerAction;
 

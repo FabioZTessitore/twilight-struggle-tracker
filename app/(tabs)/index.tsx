@@ -9,7 +9,7 @@ import { RegionHeader } from '~/components/ts/RegionHeader';
 import { CountryItem } from '~/components/ts/CountryItem';
 
 export default function Index() {
-  const { regions, countries } = useTrackerStore();
+  const { regions, countries, clearInfluences } = useTrackerStore();
   const { pointsModal, setPointsModal } = usePointStore();
 
   const sections = Object.entries(regions).map(([regionId, region]) => ({
@@ -59,6 +59,10 @@ export default function Index() {
           />
         )}
       />
+
+      <View className="mb-8 flex-row items-center px-4">
+        <Text onPress={() => clearInfluences()}>Reset influenze</Text>
+      </View>
 
       <PointSheetModal visible={pointsModal} onClose={() => setPointsModal(false)} />
     </View>
