@@ -3,6 +3,10 @@ import { useColorScheme } from '~/lib/useColorScheme';
 import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
 
 import { TabBarIcon } from '~/components/partials';
+import { View } from 'react-native';
+import { Icon } from '~/components/ui';
+import { Button } from '~/components/nativewindui/Button';
+import { usePointStore } from '~/store';
 
 type TabsProps = BottomTabNavigationOptions & {
   href?: Href | null;
@@ -26,11 +30,29 @@ export default function TabLayout() {
     tabBarIcon: ({ focused, size }) => (
       <TabBarIcon type="FontAwesome5" name="calculator" active={focused} />
     ),
+    headerRight: () => {
+      const { setPointsModal } = usePointStore();
+
+      return (
+        <View className="mr-6 flex-row gap-4">
+          <Button
+            variant="plain"
+            className="w-fit"
+            size={'icon'}
+            onPress={() => setPointsModal(true)}>
+            <Icon type="MaterialCommunityIcons" name="radioactive-circle" color="#ff0" />
+          </Button>
+          <Button variant="plain" className="w-fit" size={'icon'}>
+            <Icon type="MaterialCommunityIcons" name="cog" />
+          </Button>
+        </View>
+      );
+    },
   } as TabsProps;
 
   const DONATE_OPTIONS = {
     ...SCREEN_OPTIONS,
-    title: 'TS Tracker',
+    title: 'Donate',
     tabBarIcon: ({ focused, size }) => (
       <TabBarIcon type="FontAwesome5" name="donate" active={focused} />
     ),

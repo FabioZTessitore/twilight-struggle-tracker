@@ -1,16 +1,16 @@
-import { View } from 'react-native';
-import { Icon, Text } from '~/components/ui';
-import { FlipCounter } from '~/components/partials';
-import { StyleSheet, SectionList, StatusBar, Pressable } from 'react-native';
 import { useState } from 'react';
-
-import Regions from '~/components/ts/Regions';
+import { View, SectionList } from 'react-native';
+import { Text } from '~/components/ui';
 import { useTrackerStore } from '~/store/tracker';
-import { RegionId, Country } from '~/store/types';
-import Animated, { FadeOutRight, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { RegionId } from '~/store/types';
+import { PointSheetModal } from '~/components/ts/PointSheetModal';
+import { usePointStore } from '~/store';
+import { RegionHeader } from '~/components/ts/RegionHeader';
+import { CountryItem } from '~/components/ts/CountryItem';
 
 export default function Index() {
-  const { regions, countries } = useTrackerStore();
+  const { regions, countries, clearInfluences } = useTrackerStore();
+  const { pointsModal, setPointsModal } = usePointStore();
 
   const sections = Object.entries(regions).map(([regionId, region]) => ({
     regionId: regionId as RegionId,
@@ -35,67 +35,37 @@ export default function Index() {
   return (
     <View className="flex-1 px-4">
       <SectionList
+        ListHeaderComponent={
+          <View className="mb-4 rounded-2xl p-4">
+            <Text variant={'heading'} color={'primary'}>
+              Punti Potenziali: 3
+            </Text>
+          </View>
+        }
+        stickySectionHeadersEnabled
         sections={sections}
         keyExtractor={(item) => item.name}
         extraData={expandedSections}
         renderItem={({ section, item }) => {
           if (!expandedSections.has(section.regionId)) return null;
-          return (
-            <Animated.View exiting={FadeOutRight.duration(50)}>
-              <CountryItem country={item} />
-            </Animated.View>
-          );
+          return <CountryItem country={item} />;
         }}
         showsVerticalScrollIndicator={false}
         renderSectionHeader={({ section }) => (
           <RegionHeader
+            regionId={section.regionId}
             title={section.title}
             isExpanded={expandedSections.has(section.regionId)}
             onPress={() => handleToggle(section.regionId)}
           />
         )}
-        stickySectionHeadersEnabled
       />
+
+      <View className="mb-8 flex-row items-center px-4">
+        <Text onPress={() => clearInfluences()}>Reset influenze</Text>
+      </View>
+
+      <PointSheetModal visible={pointsModal} onClose={() => setPointsModal(false)} />
     </View>
   );
 }
-
-const CountryItem = ({ country }: { country: Country }) => (
-  <View className="flex-row justify-center gap-8 p-2">
-    <FlipCounter count={country.blueInfluence} />
-
-    <View className="w-1/3 items-center">
-      <Text>
-        {country.name}
-        {country.battleground ? ' ★' : ''}
-      </Text>
-    </View>
-
-    <FlipCounter count={country.redInfluence} />
-  </View>
-);
-
-const RegionHeader = ({
-  title,
-  isExpanded,
-  onPress,
-}: {
-  title: string;
-  isExpanded: boolean;
-  onPress: () => void;
-}) => {
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: withTiming(isExpanded ? '90deg' : '0deg', { duration: 200 }) }],
-  }));
-  return (
-    <View className="mb-2 rounded-2xl bg-card">
-      <Pressable className="flex-row items-center justify-between p-4" onPress={onPress}>
-        <Text variant="heading">{title}</Text>
-
-        <Animated.View style={animatedStyle}>
-          <Icon name="arrow-right" />
-        </Animated.View>
-      </Pressable>
-    </View>
-  );
-};

@@ -15,6 +15,22 @@ export const regions = {
       control: 9,
     },
   },
+  ME: {
+    name: 'Middle East',
+    points: {
+      presence: 3,
+      domination: 5,
+      control: 7,
+    },
+  },
+  Africa: {
+    name: 'Africa',
+    points: {
+      presence: 1,
+      domination: 4,
+      control: 6,
+    },
+  },
   CA: {
     name: 'Central America',
     points: {
@@ -29,22 +45,6 @@ export const regions = {
       presence: 2,
       domination: 5,
       control: 6,
-    },
-  },
-  Africa: {
-    name: 'Africa',
-    points: {
-      presence: 1,
-      domination: 4,
-      control: 6,
-    },
-  },
-  ME: {
-    name: 'Middle East',
-    points: {
-      presence: 3,
-      domination: 5,
-      control: 7,
     },
   },
 };
